@@ -15,7 +15,7 @@ const prep = jevko => {
 const string = (jevko) => {
   const {subjevkos, suffix} = jevko
   if (subjevkos.length === 0) return suffix
-  throw Error('oops')
+  throw Error('Text node or attribute value cannot have children.')
 }
 
 const node = (jevko, tag) => {
@@ -27,15 +27,14 @@ const node = (jevko, tag) => {
     children: [suffix],
   }
   if (suffix.trim() !== '') {
-    console.error(tag)
-    throw Error('oops')
+    throw Error(`Unwrapped text node '${suffix}' at the end of ${tag}. Remove it or wrap in [] to fix.`)
   }
   const children = []
 
   for (const {prefix, jevko} of subjevkos) {
     if (prefix.endsWith('=')) {
       const key = prefix.slice(0, -1).trim()
-      if (key in attributes) throw Error('oops')
+      if (key in attributes) throw Error(`Duplicate attribute '${key}' in ${tag}.`)
       attributes[key] = string(jevko)
     } else if (prefix === '') {
       children.push(string(jevko))
